@@ -1,0 +1,47 @@
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <link href="/css/editpollutant.css" rel="stylesheet">
+   <title>Редагувати забруднюючу речовину</title>
+   
+   <script>
+      fetch('/pollutants')
+         .then((response) => response.json())
+         .then((data) => {
+            const pollutantSelect = document.getElementById('pollutant_select');
+            data.forEach((pollutant) => {
+               const option = document.createElement('option');
+               option.value = pollutant.idpollutant;
+               option.textContent = pollutant.name;
+               if (pollutant.idpollutant == {{pollutant.idpollutant}}) {
+                  option.selected = true;
+               }
+               pollutantSelect.appendChild(option);
+         });
+      });
+   </script>
+</head>
+<body>
+   <h1>Редагувати підприємство</h1>
+   <div class="edit-pollutant">
+      <div class="delete-button-container">
+         <form action="/deletepollutant/{{pollutant.idpollutant}}" method="POST">
+            <input type="submit" value="❌" class="delete-button">
+         </form>
+      </div>
+      <form action="/editpollutant" method="POST">
+         <input name="idpollutant" value="{{pollutant.idpollutant}}" class="field" type="hidden">
+         <label>Назва забруднюючої речовини</label><br>
+         <select name="name" id="pollutant_select" class="field" disabled></select>
+         <label>Величина масової витрати, г/год</label><br>
+         <input name="mass_flow_rate" value="{{pollutant.mass_flow_rate}}" class="field"><br><br>
+         <label>Гранично допустима концентрація, мг/м3</label><br>
+         <input name="tlv" value="{{pollutant.tlv}}" class="field"><br><br>
+         <input type="submit" value="Редагувати" class="submit-button">
+      </form>
+   </div>
+   <a href="/" class="back-button">Повернутися </a>
+</body>
+<html>

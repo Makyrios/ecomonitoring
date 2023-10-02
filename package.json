@@ -1,0 +1,22 @@
+{
+  "name": "lr1",
+  "version": "1.0.0",
+  "description": "Import excel table to DB",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node DBManager.js"
+  },
+  "author": "Lavreniuk, Smolyanchuk",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-handlebars": "^7.1.2",
+    "hbs": "^4.2.0",
+    "multer": "^1.4.5-lts.1",
+    "mysql": "^2.18.1",
+    "read-excel-file": "^5.6.1"
+  }
+}

@@ -1,0 +1,59 @@
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <link href="/css/editpollution.css" rel="stylesheet">
+   <title>Редагувати поле таблиці</title>
+   
+   <script>
+      fetch('/companies')
+         .then((response) => response.json())
+         .then((data) => {
+            const companySelect = document.getElementById('company_select');
+            data.forEach((company) => {
+               const option = document.createElement('option');
+               option.value = company.idcompany;
+               option.textContent = company.name;
+               if (company.idcompany == {{pollution.idcompany}}) {
+                  option.selected = true;
+               }
+               companySelect.appendChild(option);
+            });
+         });
+
+      fetch('/pollutants')
+         .then((response) => response.json())
+         .then((data) => {
+            const pollutantSelect = document.getElementById('pollutant_select');
+            data.forEach((pollutant) => {
+               const option = document.createElement('option');
+               option.value = pollutant.idpollutant;
+               option.textContent = pollutant.name;
+               if (pollutant.idpollutant == {{pollution.idpollutant}}) {
+                  option.selected = true;
+               }
+               pollutantSelect.appendChild(option);
+            });
+         });
+   </script>
+</head>
+<body>
+   <h1>Редагувати поле</h1>
+   <div class="edit-company">
+      <form action="/edit" method="POST">
+         <input name="idpollution" value="{{pollution.idpollution}}" class="field" type="hidden">
+         <label>Назва підприємства</label><br>
+         <select name="idcompany" id="company_select" class="field"></select>
+         <label>Назва забруднюючої речовини</label><br>
+         <select name="idpollutant" id="pollutant_select" class="field"></select>
+         <label>Усього викидів забруднюючої речовини, т/рік</label><br>
+         <input name="amountpollution" value="{{pollution.amountpollution}}" class="field"><br><br>
+         <label>Період</label><br>
+         <input name="date" value="{{pollution.date}}" class="field"><br><br>
+         <input type="submit" value="Редагувати" class="submit-button">
+      </form>
+   </div>
+   <a href="/" class="back-button">Повернутися </a>
+</body>
+<html>

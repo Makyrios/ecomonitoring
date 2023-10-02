@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <link href="/css/add.css" rel="stylesheet">
+   <title>Додати підприємство</title>
+</head>
+<body>
+   <h1>Додати підприємство</h1>
+   <div class="add-field">
+      <div class="form-column">
+         <form action="/add-company" method="POST">
+            <h4>Назва підприємства</h4><br>
+            <input name="company_name" class="field"><br><br>
+            <h4>Адреса</h4><br>
+            <input name="address" class="field"><br><br>
+            <input type="submit" value="Додати" class="submit-button">
+         </form>
+
+         <form action="/import-company" enctype="multipart/form-data" method="post">
+            <label for="import-company" class="submit-button">
+               <input class="hidden"
+               type="file"
+               name="import-company-file"
+               id="import-company"
+               accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+               onchange="this.form.submit()">
+            Імпортувати дані з Excel файлу
+            </label>
+         </form>
+      </div>
+   </div>
+   <a href="/" class="back-button">До таблиці</a>
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <link href="/css/add.css" rel="stylesheet">
+   <script src="/js/addpollution.js"></script>
+   <title>Додати забруднення</title>
+</head>
+<body>
+   <h1>Додати забруднення</h1>
+   <div class="add-field">
+      <div class="form-column">
+         <form action="/add-pollution" method="POST">
+            <h4>Назва підприємства (зі списку)</h4><br>
+            <select name="idcompany" id="company_select" class="field">
+            </select><br><br>
+            <h4>Назва забруднюючої речовини (зі списку)</h4><br>
+            <select name="idpollutant" id="pollutant_select" class="field">
+            </select><br><br>
+            <h4>Кількість забруднення, т/рік</h4><br>
+            <input name="amountpollution" class="field"><br><br>
+            <h4>Період</h4><br>
+            <input name="date" class="field"><br><br>
+            <input type="submit" value="Додати" class="submit-button">
+         </form>
+
+         <form action="/import-pollution" enctype="multipart/form-data" method="POST">
+            <label for="import-pollution" class="submit-button">
+               <input class="hidden"
+               type="file"
+               name="import-pollution-file"
+               id="import-pollution"
+               accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+               onchange="this.form.submit()">
+            Імпортувати дані з Excel файлу
+            </label>
+         </form>
+      </div>
+   </div>
+   <a href="/" class="back-button">До таблиці</a>
+</body>
+</html>
