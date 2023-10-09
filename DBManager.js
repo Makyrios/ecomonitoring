@@ -11,25 +11,11 @@ const dotenv = require('dotenv').config({
 
 const urlencodedParser = express.urlencoded({ extended: false });
 
-hbs.registerHelper('divide', function (a, b) {
-  return a / b;
-});
-
-hbs.registerHelper('multiply', function (a, b) {
-  return a * b;
-});
-
-hbs.registerHelper('gt', function (a, b) {
-  return (a > b);
-});
-
-hbs.registerHelper('subtract', function (a, b) {
-  return a - b;
-});
-
-hbs.registerHelper('distanceFixed', function(distance) {
-  return distance.toFixed(2);
-});
+hbs.registerHelper('divide', (a, b) => a / b);
+hbs.registerHelper('multiply', (a, b) => a * b);
+hbs.registerHelper('gt', (a, b) => a > b);
+hbs.registerHelper('subtract', (a, b) => a - b);
+hbs.registerHelper('distanceFixed', (distance) => distance.toFixed(2));
 
 app.set("view engine", "hbs");
 
@@ -53,12 +39,9 @@ connection.connect(function (err) {
 
 app.get("/", function (req, res) {
   connection.query("SELECT \
-  p.idpollution,\
-  c.idcompany AS idcompany,\
   c.name AS company_name,\
   pol.name AS pollutant_name,\
   p.amountpollution,\
-  pol.idpollutant AS idpollutant,\
   pol.tlv,\
   pol.mass_flow_rate,\
   p.date \
@@ -69,16 +52,30 @@ JOIN \
 JOIN \
   pollutant pol ON p.idpollutant = pol.idpollutant ORDER BY p.idpollution;", function (err, pollutions) {
     if (err) return console.log(err);
-    connection.query("SELECT * FROM company", function (err, companies) {
-      if (err) return console.log(err);
-      connection.query("SELECT * from pollutant", function (err, pollutants) {
-        if (err) return console.log(err);
-        res.render("index.hbs", {
-          pollution: pollutions,
-          company: companies,
-          pollutant: pollutants
-        });
-      });
+    res.render("index.hbs", {
+      pollution: pollutions,
+    });
+  });
+});
+
+app.get("/company", function (req, res) {
+  connection.query("SELECT * FROM company", (err, companies) => {
+    if (err) {
+      console.log(err);
+    }
+    res.render("company.hbs", {
+      company: companies
+    });
+  });
+});
+
+app.get("/pollutant", function (req, res) {
+  connection.query("SELECT * FROM pollutant", (err, pollutants) => {
+    if (err) {
+      console.log(err);
+    }
+    res.render("pollutant.hbs", {
+      pollutant: pollutants
     });
   });
 });
@@ -232,7 +229,7 @@ app.post("/editcompany", urlencodedParser, function (req, res) {
   connection.query("UPDATE company SET address = ? \
    WHERE idcompany = ?", [name, address, idcompany], function (err, data) {
       if (err) return console.log(err);
-      res.redirect("/");
+      res.redirect("/company");
     });
 });
 
@@ -245,7 +242,7 @@ app.post("/editpollutant", urlencodedParser, function (req, res) {
   connection.query("UPDATE pollutant SET mass_flow_rate = ?, tlv = ? \
    WHERE idpollutant = ?", [mass_flow_rate, tlv, idpollutant], function (err, data) {
       if (err) return console.log(err);
-      res.redirect("/");
+      res.redirect("/pollutant");
     });
 });
 
@@ -262,7 +259,7 @@ app.post("/deletecompany/:idcompany", function (req, res) {
   const idcompany = req.params.idcompany;
   connection.query("DELETE FROM company WHERE idcompany=?", [idcompany], function (err, data) {
     if (err) return console.log(err);
-    res.redirect("/");
+    res.redirect("/company");
   });
 });
 
@@ -270,7 +267,7 @@ app.post("/deletepollutant/:idpollutant", function (req, res) {
   const idpollutant = req.params.idpollutant;
   connection.query("DELETE FROM pollutant WHERE idpollutant=?", [idpollutant], function (err, data) {
     if (err) return console.log(err);
-    res.redirect("/");
+    res.redirect("/pollutant");
   });
 });
 

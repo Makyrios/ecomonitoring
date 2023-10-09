@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/style.css" rel="stylesheet">
+    <title>ЛР1</title>
+</head>
+<body>
+    <div class="header">
+        <h1><b>Лабораторна робота №1</b></h1>
+        <h2>Виконали студенти ТР-13 Лавренюк Микита та Смолянчук Дарина</h2>
+    </div>
+
+    <div class="buttons">
+        <form action="/" method="GET">
+            <button id="pollutionBtn">Забруднення</button>
+        </form>
+        <button id="companiesBtn" class="active" disabled>Підприємства</button>
+        <form action="/pollutant" method="GET">
+            <button id="pollutantsBtn">Забруднюючі речовини</button>
+        </form>
+    </div>
+
+    <div class="lr_table">
+        <!-- Companies Table -->
+        <div class="table-container" id="companiesTable">
+            <h1>Підприємства</h1>
+            <table class="lr_table-container" id="pollutionTable">
+                <tr class="lr_table-tr tr-header">
+                    <th>Назва підприємства</th>
+                    <th>Адреса</th>
+                    <th>Дії</th>
+                </tr>
+                {{#each company}}
+                <tr>
+                    <td>{{this.name}}</td>
+                    <td>{{this.address}}</td>
+                    <td class="action-cell">
+                        <div class="actions-container">
+                            <form action="/editcompany/{{this.idcompany}}" method="GET" style="display:inline;">
+                                <input type="submit" value="Редагувати" class="edit-button">
+                            </form>
+                            <form action="/deletecompany/{{this.idcompany}}" method="POST" style="display:inline;">
+                                <input type="submit" value="Видалити" class="delete-button">
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {{/each}}
+            </table>
+            <div class="add-company-button-container">
+                <a href="/add-company" class="company-button add-company-button-text">Додати компанію</a>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="/js/app.js"></script>
+</body>
+</html>
