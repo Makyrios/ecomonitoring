@@ -81,7 +81,7 @@ app.get("/pollutant", function (req, res) {
 });
 
 app.get('/companies', (req, res) => {
-  connection.query("SELECT idcompany, name FROM company", (err, results) => {
+  connection.query("SELECT * FROM company", (err, results) => {
     if (err) {
       throw err;
     }
@@ -139,7 +139,7 @@ app.get("/editpollution/:idpollution", function (req, res) {
 app.get("/editcompany/:idcompany", function (req, res) {
   const idcompany = req.params.idcompany;
   connection.query(
-    "SELECT idcompany, name, address FROM company WHERE idcompany = ?", [idcompany], function (err, data) {
+    "SELECT * FROM company WHERE idcompany = ?", [idcompany], function (err, data) {
       if (err) return console.log(err);
       res.render("editcompany.hbs", {
         company: data[0]
@@ -150,7 +150,7 @@ app.get("/editcompany/:idcompany", function (req, res) {
 app.get("/editpollutant/:idpollutant", function (req, res) {
   const idpollutant = req.params.idpollutant;
   connection.query(
-    "SELECT idpollutant, mass_flow_rate, tlv FROM pollutant WHERE idpollutant = ?", [idpollutant], function (err, data) {
+    "SELECT * FROM pollutant WHERE idpollutant = ?", [idpollutant], function (err, data) {
       if (err) return console.log(err);
       res.render("editpollutant.hbs", {
         pollutant: data[0]
@@ -177,9 +177,13 @@ app.post("/add-pollution", urlencodedParser, function (req, res) {
 app.post("/add-company", urlencodedParser, function (req, res) {
   if (!req.body) return res.sendStatus(400);
   const company_name = req.body.company_name;
+  const economic_type = req.body.economic_type;
+  const ownership = req.body.ownership;
   const address = req.body.address;
 
-  connection.query("INSERT INTO company(name, address) VALUES (?, ?) as newcomp ON DUPLICATE KEY UPDATE address = newcomp.address", [company_name, address], function (err, data) {
+  connection.query("INSERT INTO company(name, economic_type, ownership, address) VALUES (?, ?, ?, ?)\
+   as newcomp ON DUPLICATE KEY UPDATE address = newcomp.address, economic_type = newcomp.economic_type, \
+   ownership = newcomp.ownership", [company_name, economic_type, ownership, address], function (err, data) {
     if (err) {
       console.log(err);
       throw err;
@@ -223,11 +227,12 @@ app.post("/editpollution", urlencodedParser, function (req, res) {
 app.post("/editcompany", urlencodedParser, function (req, res) {
   if (!req.body) return res.sendStatus(400);
   const idcompany = req.body.idcompany;
-  const name = req.body.name;
+  const economic_type = req.body.economic_type;
+  const ownership = req.body.ownership;
   const address = req.body.address;
 
-  connection.query("UPDATE company SET address = ? \
-   WHERE idcompany = ?", [name, address, idcompany], function (err, data) {
+  connection.query("UPDATE company SET economic_type = ?, ownership = ?, address = ? \
+   WHERE idcompany = ?", [economic_type, ownership, address, idcompany], function (err, data) {
       if (err) return console.log(err);
       res.redirect("/company");
     });
@@ -288,7 +293,7 @@ app.post('/import-company', uploadFile.single('import-company-file'), (req, res)
   }
   importFileToCompanyDb(process.cwd() + '/uploads/' + req.file.filename);
   setTimeout(() => {
-    res.redirect("/add-company");
+    res.redirect("/company");
   }, 100);
 });
 
@@ -298,7 +303,7 @@ app.post('/import-pollutant', uploadFile.single('import-pollutant-file'), (req, 
   }
   importFileToPollutantDb(process.cwd() + '/uploads/' + req.file.filename);
   setTimeout(() => {
-    res.redirect("/add-pollutant");
+    res.redirect("/pollutant");
   }, 100);
 });
 
@@ -308,9 +313,37 @@ app.post('/import-pollution', uploadFile.single('import-pollution-file'), (req, 
   }
   importFileToPollutionDb(process.cwd() + '/uploads/' + req.file.filename);
   setTimeout(() => {
-    res.redirect("/add-pollution");
+    res.redirect("/");
   }, 100);
 });
+
+
+function importFileToPollutionDb(exFile) {
+  readXlsxFile(exFile).then((rows) => {
+    rows.shift();
+
+    for (let i = 0; i < rows.length; i++) {
+      const companyName = rows[i][0];
+      const pollutantName = rows[i][1];
+      const amountpollution = rows[i][2];
+      const date = rows[i][3];
+
+      connection.query("INSERT INTO pollution (amountpollution, idcompany, idpollutant, date) VALUES \
+      (?, (SELECT idcompany FROM company WHERE name=?), \
+      (SELECT idpollutant FROM pollutant WHERE name=?), ?) AS newpollution \
+      ON DUPLICATE KEY UPDATE amountpollution = newpollution.amountpollution;", [amountpollution, companyName, pollutantName, date], function (err, data) {
+        if (err) {
+          if (err.code == 'ER_TRUNCATED_WRONG_VALUE_FOR_FIELD') {
+            console.log('Неправильний формат даних');
+            return console.log(err);
+          } else {
+            console.log(err);
+          }
+        }
+      });
+    }
+  })
+}
 
 function importFileToCompanyDb(exFile) {
   readXlsxFile(exFile).then((rows) => {
@@ -318,9 +351,13 @@ function importFileToCompanyDb(exFile) {
 
     for (let i = 0; i < rows.length; i++) {
       const companyName = rows[i][0];
-      const address = rows[i][1];
+      const economic_type = rows[i][1];
+      const ownership = rows[i][2];
+      const address = rows[i][3];
 
-      connection.query("INSERT INTO company(name, address) VALUES (?, ?) as newcomp ON DUPLICATE KEY UPDATE address = newcomp.address", [companyName, address], function (err, data) {
+      connection.query("INSERT INTO company(name, economic_type, ownership, address) VALUES (?, ?, ?, ?)\
+      as newcomp ON DUPLICATE KEY UPDATE address = newcomp.address, economic_type = newcomp.economic_type, \
+      ownership = newcomp.ownership", [companyName, economic_type, ownership, address], function (err, data) {
         if (err) {
           console.log(err);
           throw err;
@@ -349,31 +386,6 @@ function importFileToPollutantDb(exFile) {
   });
 }
 
-function importFileToPollutionDb(exFile) {
-  readXlsxFile(exFile).then((rows) => {
-    rows.shift();
-
-    for (let i = 0; i < rows.length; i++) {
-      const companyName = rows[i][0];
-      const pollutantName = rows[i][1];
-      const amountpollution = rows[i][2];
-      const date = rows[i][3];
-
-      connection.query("INSERT INTO pollution (amountpollution, idcompany, idpollutant, date) VALUES \
-      (?, (SELECT idcompany FROM company WHERE name=?), \
-      (SELECT idpollutant FROM pollutant WHERE name=?), ?) AS newpollution ON DUPLICATE KEY UPDATE amountpollution = newpollution.amountpollution;", [amountpollution, companyName, pollutantName, date], function (err, data) {
-        if (err) {
-          if (err.code == 'ER_TRUNCATED_WRONG_VALUE_FOR_FIELD') {
-            console.log('Неправильний формат даних');
-            return console.log(err);
-          } else {
-            console.log(err);
-          }
-        }
-      });
-    }
-  })
-}
 
 const port = 3000;
 app.listen(port, () => {

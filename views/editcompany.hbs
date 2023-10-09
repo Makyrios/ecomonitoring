@@ -35,11 +35,15 @@
          <input name="idcompany" value="{{company.idcompany}}" class="field" type="hidden">
          <label>Назва підприємства</label><br>
          <select name="name" id="company_select" class="field" disabled></select>
-         <label>Адреса</label><br>
+         <label>Вид економічної діяльності</label><br>
+         <input name="economic_type" value="{{company.economic_type}}" class="field"><br><br>
+         <label>Відомча належність (форма власності)</label><br>
+         <input name="ownership" value="{{company.ownership}}" class="field"><br><br>
+         <label>Адреса головного офісу</label><br>
          <input name="address" value="{{company.address}}" class="field"><br><br>
          <input type="submit" value="Редагувати" class="submit-button">
       </form>
    </div>
-   <a href="/" class="back-button">Повернутися </a>
+   <a href="/company" class="back-button">Повернутися </a>
 </body>
 <html>

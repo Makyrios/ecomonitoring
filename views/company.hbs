@@ -30,12 +30,16 @@
             <table class="lr_table-container" id="pollutionTable">
                 <tr class="lr_table-tr tr-header">
                     <th>Назва підприємства</th>
-                    <th>Адреса</th>
+                    <th>Вид економічної діяльності</th>
+                    <th>Відомча належність (форма власності)</th>
+                    <th>Адреса головного офісу</th>
                     <th>Дії</th>
                 </tr>
                 {{#each company}}
                 <tr>
                     <td>{{this.name}}</td>
+                    <td>{{this.economic_type}}</td>
+                    <td>{{this.ownership}}</td>
                     <td>{{this.address}}</td>
                     <td class="action-cell">
                         <div class="actions-container">
