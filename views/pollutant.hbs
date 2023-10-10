@@ -29,16 +29,20 @@
             <h1>Забруднюючі речовини</h1>
             <table class="lr_table-container" id="pollutionTable">
                 <tr class="lr_table-tr tr-header">
+                    <th>ID</th>
                     <th>Назва забруднючої речовини</th>
-                    <th>Величина масової витрати</th>
-                    <th>ГДК</th>
+                    <th>Величина масової витрати, г/год</th>
+                    <th>Гранична допустима концентрація, мг/м³</th>
+                    <th>Клас небезпеки</th>
                     <th>Дії</th>
                 </tr>
                 {{#each pollutant}}
                 <tr>
+                    <td>{{this.idpollutant}}</td>
                     <td>{{this.name}}</td>
                     <td>{{this.mass_flow_rate}}</td>
                     <td>{{this.tlv}}</td>
+                    <td>{{this.danger}}</td>
                     <td class="action-cell">
                         <div class="actions-container">
                             <form action="/editpollutant/{{this.idpollutant}}" method="GET" style="display:inline;">

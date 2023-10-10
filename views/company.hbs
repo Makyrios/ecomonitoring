@@ -29,6 +29,7 @@
             <h1>Підприємства</h1>
             <table class="lr_table-container" id="pollutionTable">
                 <tr class="lr_table-tr tr-header">
+                    <th>ID</th>
                     <th>Назва підприємства</th>
                     <th>Вид економічної діяльності</th>
                     <th>Відомча належність (форма власності)</th>
@@ -37,6 +38,7 @@
                 </tr>
                 {{#each company}}
                 <tr>
+                    <td>{{this.idcompany}}</td>
                     <td>{{this.name}}</td>
                     <td>{{this.economic_type}}</td>
                     <td>{{this.ownership}}</td>

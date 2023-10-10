@@ -30,26 +30,27 @@
                 <tr class="lr_table-tr tr-header">
                     <th rowspan="2">Назва підприємства</th>
                     <th rowspan="2">Назва забруднюючої речовини</th>
-                    <th rowspan="2">Усього викидів підприємства т/рік</th>
+                    <th rowspan="2">Усього викидів підприємства, т/рік</th>
                     <th colspan="2">Нормативи ГДВ забруднюючих речовин</th>
+                    <th rowspan="2">Клас небезпеки</th>
                     <th rowspan="2">Період</th>
-                    <th rowspan="2">Кількість перевищення викидів, г/год</th>
                     <th rowspan="2">Дії</th>
                 </tr>
                 <tr class="lr_table-tr tr-header">
-                    <th>Величина масової витрати, г/год</th>
+                    <th>Величина масової витрати, т/рік</th>
                     <th>Гранично допустимі викиди, мг/м3</th>
                 </tr>
                 {{#each pollution}}
                 <tr>
                     <td>{{this.company_name}}</td>
                     <td>{{this.pollutant_name}}</td>
-                    <td>{{this.amountpollution}}</td>
-                    <td>{{this.mass_flow_rate}}</td>
+                    <td>{{distanceFixed this.amountpollution}}</td>
+                    <td>{{distanceFixed (divide this.mass_flow_rate 114.1552)}}</td>
                     <td>{{this.tlv}}</td>
+                    {{!-- <td class="{{#if (gt (multiply this.amountpollution 114.1552) this.mass_flow_rate)}} greater {{else}} less {{/if}}">
+                        {{distanceFixed (subtract (multiply this.amountpollution 114.1552) this.mass_flow_rate)}} --}}
+                    <td>{{this.danger}}</td>
                     <td>{{this.date}}</td>
-                    <td class="{{#if (gt (multiply this.amountpollution 114.1552) this.mass_flow_rate)}} greater {{else}} less {{/if}}">
-                        {{distanceFixed (subtract (multiply this.amountpollution 114.1552) this.mass_flow_rate)}}
                     </td>
                     <td class="action-cell">
                         <div class="actions-container">
