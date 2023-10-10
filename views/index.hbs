@@ -45,11 +45,11 @@
                     <td>{{this.company_name}}</td>
                     <td>{{this.pollutant_name}}</td>
                     <td>{{distanceFixed this.amountpollution}}</td>
-                    <td>{{distanceFixed (divide this.mass_flow_rate 114.1552)}}</td>
-                    <td>{{this.tlv}}</td>
+                    <td>{{checkValue (distanceFixed (divide this.mass_flow_rate 114.1552))}}</td>
+                    <td>{{checkValue this.tlv}}</td>
                     {{!-- <td class="{{#if (gt (multiply this.amountpollution 114.1552) this.mass_flow_rate)}} greater {{else}} less {{/if}}">
                         {{distanceFixed (subtract (multiply this.amountpollution 114.1552) this.mass_flow_rate)}} --}}
-                    <td>{{this.danger}}</td>
+                    <td>{{checkValue this.danger}}</td>
                     <td>{{this.date}}</td>
                     </td>
                     <td class="action-cell">

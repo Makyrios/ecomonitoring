@@ -16,6 +16,12 @@ hbs.registerHelper('multiply', (a, b) => a * b);
 hbs.registerHelper('gt', (a, b) => a > b);
 hbs.registerHelper('subtract', (a, b) => a - b);
 hbs.registerHelper('distanceFixed', (distance) => distance.toFixed(2));
+hbs.registerHelper('checkValue', function (value) {
+  if (value < 0) {
+    return '-';
+  }
+  return value;
+});
 
 app.set("view engine", "hbs");
 

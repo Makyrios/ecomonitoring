@@ -40,9 +40,9 @@
                 <tr>
                     <td>{{this.idpollutant}}</td>
                     <td>{{this.name}}</td>
-                    <td>{{this.mass_flow_rate}}</td>
-                    <td>{{this.tlv}}</td>
-                    <td>{{this.danger}}</td>
+                    <td>{{checkValue this.mass_flow_rate}}</td>
+                    <td>{{checkValue this.tlv}}</td>
+                    <td>{{checkValue this.danger}}</td>
                     <td class="action-cell">
                         <div class="actions-container">
                             <form action="/editpollutant/{{this.idpollutant}}" method="GET" style="display:inline;">
