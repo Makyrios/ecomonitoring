@@ -378,6 +378,7 @@ function importFileToPollutantDb(exFile) {
       const pollutantName = rows[i][0];
       const mass_flow_rate = rows[i][1];
       const tlv = rows[i][2];
+      const danger = rows[i][3];
 
       connection.query("INSERT INTO pollutant(name, mass_flow_rate, tlv, danger) VALUES (?, ?, ?, ?) as newpol " +
         "ON DUPLICATE KEY UPDATE mass_flow_rate = newpol.mass_flow_rate, tlv = newpol.tlv, danger = newpol.danger", [pollutantName, mass_flow_rate, tlv, danger], function (err, data) {
