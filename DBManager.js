@@ -39,6 +39,7 @@ connection.connect(function (err) {
 
 app.get("/", function (req, res) {
   connection.query("SELECT \
+  p.idpollution,\
   c.name AS company_name,\
   pol.name AS pollutant_name,\
   p.amountpollution,\
