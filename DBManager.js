@@ -44,6 +44,7 @@ app.get("/", function (req, res) {
   p.amountpollution,\
   pol.tlv,\
   pol.mass_flow_rate,\
+  pol.danger,\
   p.date \
 FROM \
   company c \
@@ -90,7 +91,7 @@ app.get('/companies', (req, res) => {
 });
 
 app.get('/pollutants', (req, res) => {
-  connection.query("SELECT idpollutant, name FROM pollutant", (err, results) => {
+  connection.query("SELECT * FROM pollutant", (err, results) => {
     if (err) {
       throw err;
     }
@@ -197,9 +198,11 @@ app.post("/add-pollutant", urlencodedParser, function (req, res) {
   const pollutant_name = req.body.name;
   const mass_flow_rate = req.body.mass_flow_rate;
   const tlv = req.body.tlv;
+  const danger = req.body.danger;
 
-  connection.query("INSERT INTO pollutant(name, mass_flow_rate, tlv) VALUES (?, ?, ?) as newcomp " +
-    "ON DUPLICATE KEY UPDATE mass_flow_rate = newcomp.mass_flow_rate, tlv = newcomp.tlv", [pollutant_name, mass_flow_rate, tlv], function (err, data) {
+  connection.query("INSERT INTO pollutant(name, mass_flow_rate, tlv, danger) VALUES (?, ?, ?, ?) as newpol " +
+    "ON DUPLICATE KEY UPDATE mass_flow_rate = newpol.mass_flow_rate, tlv = newpol.tlv, danger = newpol.danger", [pollutant_name, mass_flow_rate, tlv, danger],
+    function (err, data) {
       if (err) {
         throw err;
       }
@@ -376,8 +379,8 @@ function importFileToPollutantDb(exFile) {
       const mass_flow_rate = rows[i][1];
       const tlv = rows[i][2];
 
-      connection.query("INSERT INTO pollutant(name, mass_flow_rate, tlv) VALUES (?, ?, ?) as newcomp " +
-        "ON DUPLICATE KEY UPDATE mass_flow_rate = newcomp.mass_flow_rate, tlv = newcomp.tlv", [pollutantName, mass_flow_rate, tlv], function (err, data) {
+      connection.query("INSERT INTO pollutant(name, mass_flow_rate, tlv, danger) VALUES (?, ?, ?, ?) as newpol " +
+        "ON DUPLICATE KEY UPDATE mass_flow_rate = newpol.mass_flow_rate, tlv = newpol.tlv, danger = newpol.danger", [pollutantName, mass_flow_rate, tlv, danger], function (err, data) {
           if (err) {
             throw err;
           }
