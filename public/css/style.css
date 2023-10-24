@@ -143,7 +143,8 @@ h1 {
   margin-top: 20px;
 }
 
-button {
+
+.b-button {
   padding: 10px 20px;
   background-color: #007acc;
   color: white;
@@ -154,7 +155,7 @@ button {
   transition: background-color 0.3s;
 }
 
-button:hover {
+.b-button:hover {
   background-color: #005ea6;
 }
 
@@ -165,4 +166,47 @@ button:hover {
 .actions-container {
   display: flex;
   justify-content: center;
+}
+
+
+.dropdown {
+  position: fixed;
+  margin: 10px;
+}
+
+.dropbtn {
+  padding: 10px 20px;
+  color: #007acc;
+  cursor: pointer;
+  font-size: 16px;
+  border: none;
+}
+
+.dropbtn:hover {
+  color: #005ea6;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+.dropdown-content a {
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  color: #333;
+  font-size: 16px;
+}
+
+.dropdown-content a:hover {
+  background-color: #ddd;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
 }
