@@ -15,12 +15,74 @@ hbs.registerHelper('divide', (a, b) => a / b);
 hbs.registerHelper('multiply', (a, b) => a * b);
 hbs.registerHelper('gt', (a, b) => a > b);
 hbs.registerHelper('subtract', (a, b) => a - b);
-hbs.registerHelper('distanceFixed', (distance) => distance.toFixed(2));
+hbs.registerHelper('distFixed', (dist) => parseFloat(dist).toFixed(3));
+hbs.registerHelper('crFixed', (dist) => parseFloat(dist).toFixed(8));
 hbs.registerHelper('checkValue', function (value) {
-  if (value < 0) {
+  if (value < 0 || value == null) {
     return '-';
   }
   return value;
+});
+hbs.registerHelper('riskHQColor', function (value) {
+  if (value < 0) {
+    return "";
+  }
+
+  if (value < 1) {
+    return "low";
+  }
+  else if (value == 1) {
+    return "medium";
+  }
+  else {
+    return "high";
+  }
+});
+hbs.registerHelper('riskCRColor', function (value) {
+  if (value < 0) {
+    return "";
+  }
+
+  if (value < 0.000001) {
+    return "very-low";
+  }
+  else if (value >= 0.000001 && value < 0.0001) {
+    return "low";
+  }
+  else if (value >= 0.0001 && value < 0.001) {
+    return "medium";
+  }
+  else {
+    return "high";
+  }
+});
+
+// hbs.registerHelper('calculateAddLadd', (Ca) => {
+//   BW = 60, daysInYear = 365,
+//   Tout = 1.64, Tin = 19.69, AT = 70,
+//   Vout = 0.63, Vin = 0.5, ED = 70;
+//   return (((Ca*Tout*Vout)+(Ca*Tin*Vin))*daysInYear*ED)/(BW*AT*daysInYear);
+// });
+
+function calculateAddLadd(Ca) {
+  BW = 65, EF = 350,
+  Tout = 5.3, Tin = 18.7, AT = 70,
+  Vout = 1.4, Vin = 0.63, ED = 30;
+  return (((Ca*Tout*Vout)+(Ca*Tin*Vin))*EF*ED)/(BW*AT*365);
+}
+
+hbs.registerHelper('calculateHq', (Ca, RfC) => {
+  if (Ca <= 0 || RfC <= 0) {
+    return '-1';
+  }
+  return Ca / RfC;
+});
+
+hbs.registerHelper('calculateCr', (Ca, SF) => {
+  if (Ca <= 0 || SF <= 0) {
+    return '-1';
+  }
+  return calculateAddLadd(Ca) * SF;
 });
 
 app.set("view engine", "hbs");
@@ -49,8 +111,11 @@ app.get("/", function (req, res) {
   c.name AS company_name,\
   pol.name AS pollutant_name,\
   p.amountpollution,\
+  p.concentration,\
   pol.tlv,\
   pol.mass_flow_rate,\
+  pol.rfc,\
+  pol.sf,\
   pol.danger,\
   p.date \
 FROM \
@@ -171,10 +236,11 @@ app.post("/add-pollution", urlencodedParser, function (req, res) {
   const idcompany = req.body.idcompany;
   const idpollutant = req.body.idpollutant;
   const amountpollution = req.body.amountpollution;
+  const concentration = req.body.concentration;
   const date = req.body.date;
 
-  connection.query("INSERT INTO pollution (amountpollution, idcompany, idpollutant, date) VALUES (?, ?, ?, ?) AS newPoll \
-  ON DUPLICATE KEY UPDATE amountpollution=newPoll.amountpollution", [amountpollution, idcompany, idpollutant, date], function (err, data) {
+  connection.query("INSERT INTO pollution (amountpollution, concentration, idcompany, idpollutant, date) VALUES (?, ?, ?, ?, ?) AS newPoll \
+  ON DUPLICATE KEY UPDATE amountpollution=newPoll.amountpollution", [amountpollution, concentration, idcompany, idpollutant, date], function (err, data) {
     if (err) {
       console.log(err);
     }
@@ -205,10 +271,12 @@ app.post("/add-pollutant", urlencodedParser, function (req, res) {
   const pollutant_name = req.body.name;
   const mass_flow_rate = req.body.mass_flow_rate;
   const tlv = req.body.tlv;
+  const rfc = req.body.rfc;
+  const sf = req.body.sf;
   const danger = req.body.danger;
 
-  connection.query("INSERT INTO pollutant(name, mass_flow_rate, tlv, danger) VALUES (?, ?, ?, ?) as newpol " +
-    "ON DUPLICATE KEY UPDATE mass_flow_rate = newpol.mass_flow_rate, tlv = newpol.tlv, danger = newpol.danger", [pollutant_name, mass_flow_rate, tlv, danger],
+  connection.query("INSERT INTO pollutant(name, mass_flow_rate, tlv, rfc, sf danger) VALUES (?, ?, ?, ?, ?, ?) as newpol " +
+    "ON DUPLICATE KEY UPDATE mass_flow_rate = newpol.mass_flow_rate, tlv = newpol.tlv, rfc=newpol.rfc, sf=newpol.sf danger = newpol.danger", [pollutant_name, mass_flow_rate, tlv, rfc, sf, danger],
     function (err, data) {
       if (err) {
         throw err;
@@ -223,12 +291,13 @@ app.post("/editpollution", urlencodedParser, function (req, res) {
   const idcompany = req.body.idcompany;
   const idpollutant = req.body.idpollutant;
   const amountpollution = req.body.amountpollution;
+  const concentration = req.body.concentration;
   const date = req.body.date;
 
-  connection.query("UPDATE pollution SET amountpollution = ?,\
+  connection.query("UPDATE pollution SET amountpollution = ?, concentration = ?,\
    idcompany = ?,\
    idpollutant = ?,\
-   date = ? WHERE idpollution = ?", [amountpollution, idcompany, idpollutant, date, idpollution], function (err, data) {
+   date = ? WHERE idpollution = ?", [amountpollution, concentration, idcompany, idpollutant, date, idpollution], function (err, data) {
       if (err) return console.log(err);
       res.redirect("/");
     });
@@ -253,9 +322,11 @@ app.post("/editpollutant", urlencodedParser, function (req, res) {
   const idpollutant = req.body.idpollutant;
   const mass_flow_rate = req.body.mass_flow_rate;
   const tlv = req.body.tlv;
+  const rfc = req.body.rfc;
+  const sf = req.body.sf;
 
-  connection.query("UPDATE pollutant SET mass_flow_rate = ?, tlv = ? \
-   WHERE idpollutant = ?", [mass_flow_rate, tlv, idpollutant], function (err, data) {
+  connection.query("UPDATE pollutant SET mass_flow_rate = ?, tlv = ?, rfc = ?, sf = ? \
+   WHERE idpollutant = ?", [mass_flow_rate, tlv, rfc, sf, idpollutant], function (err, data) {
       if (err) return console.log(err);
       res.redirect("/pollutant");
     });
@@ -336,18 +407,18 @@ function importFileToPollutionDb(exFile) {
       const companyName = rows[i][0];
       const pollutantName = rows[i][1];
       const amountpollution = rows[i][2];
-      const date = rows[i][3];
-
-      connection.query("INSERT INTO pollution (amountpollution, idcompany, idpollutant, date) VALUES \
-      (?, (SELECT idcompany FROM company WHERE name=?), \
+      const concentration = rows[i][3];
+      const date = rows[i][4];
+      
+      connection.query("INSERT INTO pollution (amountpollution, concentration, idcompany, idpollutant, date) VALUES \
+      (?, ?, (SELECT idcompany FROM company WHERE name=?), \
       (SELECT idpollutant FROM pollutant WHERE name=?), ?) AS newpollution \
-      ON DUPLICATE KEY UPDATE amountpollution = newpollution.amountpollution;", [amountpollution, companyName, pollutantName, date], function (err, data) {
+      ON DUPLICATE KEY UPDATE amountpollution = newpollution.amountpollution, concentration=newpollution.concentration;",
+       [amountpollution, concentration, companyName, pollutantName, date], function (err, data) {
         if (err) {
           if (err.code == 'ER_TRUNCATED_WRONG_VALUE_FOR_FIELD') {
             console.log('Неправильний формат даних');
             return console.log(err);
-          } else {
-            console.log(err);
           }
         }
       });
@@ -385,10 +456,14 @@ function importFileToPollutantDb(exFile) {
       const pollutantName = rows[i][0];
       const mass_flow_rate = rows[i][1];
       const tlv = rows[i][2];
-      const danger = rows[i][3];
+      const rfc = rows[i][3];
+      const sf = rows[i][4];
+      console.log(sf);
+      const danger = rows[i][5];
 
-      connection.query("INSERT INTO pollutant(name, mass_flow_rate, tlv, danger) VALUES (?, ?, ?, ?) as newpol " +
-        "ON DUPLICATE KEY UPDATE mass_flow_rate = newpol.mass_flow_rate, tlv = newpol.tlv, danger = newpol.danger", [pollutantName, mass_flow_rate, tlv, danger], function (err, data) {
+      connection.query("INSERT INTO pollutant(name, mass_flow_rate, tlv, rfc, sf, danger) VALUES (?, ?, ?, ?, ?, ?) as newpol " +
+        "ON DUPLICATE KEY UPDATE mass_flow_rate = newpol.mass_flow_rate, tlv = newpol.tlv, rfc=newpol.rfc, sf=newpol.sf, danger = newpol.danger",
+         [pollutantName, mass_flow_rate, tlv, rfc, sf, danger], function (err, data) {
           if (err) {
             throw err;
           }

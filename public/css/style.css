@@ -210,3 +210,19 @@ h1 {
 .dropdown:hover .dropdown-content {
   display: block;
 }
+
+.low {
+  background-color: #00ff00;
+}
+
+.medium {
+  background-color: #ffff00;
+}
+
+.high {
+  background-color: #ff0000;
+}
+
+.very-low {
+  background-color: #98cbe2;
+}

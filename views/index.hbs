@@ -32,7 +32,10 @@
                     <th rowspan="2">Назва підприємства</th>
                     <th rowspan="2">Назва забруднюючої речовини</th>
                     <th rowspan="2">Усього викидів підприємства, т/рік</th>
+                    <th rowspan="2">Концентрація, мг/м³</th>
                     <th colspan="2">Нормативи ГДВ забруднюючих речовин</th>
+                    <th rowspan="2">Коефіцієнт неканцерогенного ризику (HQ)</th>
+                    <th rowspan="2">Коефіцієнт канцерогенного ризику (CR)</th>
                     <th rowspan="2">Клас небезпеки</th>
                     <th rowspan="2">Період</th>
                     <th rowspan="2">Дії</th>
@@ -45,11 +48,15 @@
                 <tr>
                     <td>{{this.company_name}}</td>
                     <td>{{this.pollutant_name}}</td>
-                    <td>{{distanceFixed this.amountpollution}}</td>
-                    <td>{{checkValue (distanceFixed (divide this.mass_flow_rate 114.1552))}}</td>
+                    <td>{{this.amountpollution}}</td>
+                    <td>{{this.concentration}}</td>
+                    <td>{{checkValue (distFixed (divide this.mass_flow_rate 114.1552))}}</td>
                     <td>{{checkValue this.tlv}}</td>
+                    <td class="{{riskHQColor (calculateHq this.concentration this.rfc)}}">{{checkValue (distFixed (calculateHq this.concentration this.rfc))}}</td> {{!-- HQ --}}
+                    <td class="{{riskCRColor (calculateCr this.concentration this.sf)}}">{{checkValue (crFixed (calculateCr this.concentration this.sf))}}</td> {{!-- CR --}}
                     {{!-- <td class="{{#if (gt (multiply this.amountpollution 114.1552) this.mass_flow_rate)}} greater {{else}} less {{/if}}">
                         {{distanceFixed (subtract (multiply this.amountpollution 114.1552) this.mass_flow_rate)}} --}}
+                    
                     <td>{{checkValue this.danger}}</td>
                     <td>{{this.date}}</td>
                     </td>

@@ -34,6 +34,8 @@
                     <th>Назва забруднючої речовини</th>
                     <th>Величина масової витрати, г/год</th>
                     <th>Гранична допустима концентрація, мг/м³</th>
+                    <th>Референтна концентрація (RfC) мг/м³</th>
+                    <th>Фактор нахилу (SF) мг/(кг * доба)</th>
                     <th>Клас небезпеки</th>
                     <th>Дії</th>
                 </tr>
@@ -43,6 +45,8 @@
                     <td>{{this.name}}</td>
                     <td>{{checkValue this.mass_flow_rate}}</td>
                     <td>{{checkValue this.tlv}}</td>
+                    <td>{{checkValue this.rfc}}</td>
+                    <td>{{checkValue this.sf}}</td>
                     <td>{{checkValue this.danger}}</td>
                     <td class="action-cell">
                         <div class="actions-container">

@@ -37,8 +37,12 @@
          <select name="name" id="pollutant_select" class="field" disabled></select>
          <label>Величина масової витрати, г/год</label><br>
          <input name="mass_flow_rate" value="{{pollutant.mass_flow_rate}}" class="field"><br><br>
-         <label>Гранично допустима концентрація, мг/м3</label><br>
+         <label>Гранично допустима концентрація, мг/м³</label><br>
          <input name="tlv" value="{{pollutant.tlv}}" class="field"><br><br>
+         <label>Референтна концентрація (RfC) мг/м³</label><br>
+         <input name="rfc" value="{{pollutant.rfc}}" class="field"><br><br>
+         <label>Фактор нахилу (SF) мг/(кг * доба)</label><br>
+         <input name="sf" value="{{pollutant.sf}}" class="field"><br><br>
          <label>Клас небезпеки</label><br>
          <input name="danger" value="{{pollutant.danger}}" class="field"><br><br>
          <input type="submit" value="Редагувати" class="submit-button">
