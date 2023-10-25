@@ -192,6 +192,7 @@ app.get("/editpollution/:idpollution", function (req, res) {
     c.idcompany AS idcompany, \
     pol.idpollutant, \
     p.amountpollution, \
+    p.concentration,\
     pol.tlv, \
     pol.mass_flow_rate, \
     p.date \

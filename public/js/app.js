@@ -36,3 +36,35 @@ function filterTable() {
         }
     });
 }
+
+const HQ = document.getElementById("HQ");
+const CR = document.getElementById("CR");
+
+const tableCells = [HQ, CR];
+
+tableCells.forEach(cell => {
+    cell.addEventListener("mouseover", () => {
+        let additionalInfo;
+        if (cell.id === "HQ") {
+            additionalInfo = document.getElementById("HQadditionalInfo");
+        }
+        else if (cell.id == "CR") {
+            additionalInfo = document.getElementById("CRadditionalInfo");
+        }
+        additionalInfo.style.display = "block";
+
+        additionalInfo.style.left = cell.getBoundingClientRect().x + cell.getBoundingClientRect().width / 2 + "px";
+        additionalInfo.style.top = cell.getBoundingClientRect().y + "px";
+    });
+
+    cell.addEventListener("mouseout", () => {
+        let additionalInfo;
+        if (cell.id === "HQ") {
+            additionalInfo = document.getElementById("HQadditionalInfo");
+        }
+        else if (cell.id == "CR") {
+            additionalInfo = document.getElementById("CRadditionalInfo");
+        }
+        additionalInfo.style.display = "none";
+    });
+});

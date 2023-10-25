@@ -24,6 +24,19 @@
         </form>
     </div>
 
+    {{!-- HQ and CR colors info  --}}
+    <div id="HQadditionalInfo" class="additional-info">
+        <p><b style="color:#00ff00">HQ < 1</b>: Ризик виникнення шкідливих ефектів розглядають як зневажливо малий</p>
+        <p><b style="color:#ffff00">HQ = 1</b>: Гранична величина, що не потребує термінових заходів, однак не може розглядатися як досить прийнятна</p>
+        <p><b style="color:#ff0000">HQ > 1</b>: Імовірність розвитку шкідливих ефектів зростає пропорційно збільшенню HQ</p>
+    </div>
+    <div id="CRadditionalInfo" class="additional-info">
+        <p><b style="color:#98cbe2">CR < 10^(-6)</b>: Мінімальний (De Minimis) - бажана (цільова) величина ризику при проведенні оздоровчих і природоохоронних заходів</p>
+        <p><b style="color:#00ff00">CR > 10^(-6) - CR < 10^(-4)</b>: Низький - припустимий ризик (рівень, на якому, як правило, встановлюються гігієнічні нормативи для населення)</p>
+        <p><b style="color:#ffff00">CR > 10^(-4) - CR < 10^(-3)</b>: Середній - припустимий для виробничих умов; за впливу на все населення необхідний динамічний контроль і поглиблене вивчення джерел і можливих наслідків шкідливих впливів для вирішення питання про заходи з управління ризиком</p>
+        <p><b style="color:#ff0000">CR > 10^(-3)</b>: Високий (De Manifestis) - не прийнятний для виробничих умов і населення. Необхідне здійснення заходів з усунення або зниження ризику</p>
+    </div>
+
     <div class="lr_table">
         <div class="table-container" id="pollutionTable">
             <table class="lr_table-container">
@@ -40,8 +53,8 @@
                     <th rowspan="2">Усього викидів підприємства, т/рік</th>
                     <th rowspan="2">Концентрація, мг/м³</th>
                     <th colspan="2">Нормативи ГДВ забруднюючих речовин</th>
-                    <th rowspan="2">Коефіцієнт неканцерогенного ризику (HQ)</th>
-                    <th rowspan="2">Коефіцієнт канцерогенного ризику (CR)</th>
+                    <th rowspan="2" id="HQ">Коефіцієнт неканцерогенного ризику (HQ)</th>
+                    <th rowspan="2" id="CR">Коефіцієнт канцерогенного ризику (CR)</th>
                     <th rowspan="2">Клас небезпеки</th>
                     <th rowspan="2" style="min-width: 80px;"><a id="yearTh" onclick="toggleFilter('yearFilter', 'yearTh')" style="cursor:pointer;">Період ▼</a>
                         <br><br><input type="number" id="yearFilter" oninput="filterTable()" class="filter-input-disabled" />

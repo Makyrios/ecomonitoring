@@ -235,3 +235,13 @@ h1 {
 .very-low {
   background-color: #98cbe2;
 }
+
+.additional-info {
+  display: none;
+  position: absolute;
+  color: white;
+  background-color: grey;
+  border: 1px solid #ccc;
+  padding: 10px;
+  z-index: 999;
+}
