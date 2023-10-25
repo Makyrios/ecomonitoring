@@ -53,6 +53,15 @@ h1 {
   box-shadow: 0 0 8px rgba(156, 156, 156, 0.5);
 }
 
+.filter-input {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.filter-input-disabled {
+  display: none;
+}
+
 .lr_table-container .tr-header {
   background-color: #007acc;
   color: white;

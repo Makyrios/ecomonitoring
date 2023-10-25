@@ -1,39 +1,38 @@
-// Get references to the buttons and table containers
-const pollutionBtn = document.getElementById("pollutionBtn");
-const companiesBtn = document.getElementById("companiesBtn");
-const pollutantsBtn = document.getElementById("pollutantsBtn");
+function toggleFilter(filterName, thName) {
+    const filter = document.getElementById(filterName);
+    const th = document.getElementById(thName);
+    if (filter.classList.contains("filter-input-disabled")) {
+        th.innerHTML = th.innerHTML.slice(0, -1) + "▲";
+        filter.classList.remove("filter-input-disabled");
+        filter.classList.add("filter-input");
+    } else {
+        th.innerHTML = th.innerHTML.slice(0, -1) + "▼";
+        filter.classList.remove("filter-input");
+        filter.classList.add("filter-input-disabled");
+    }
+}
 
-const pollutionTable = document.getElementById("pollutionTable");
-const companiesTable = document.getElementById("companiesTable");
-const pollutantsTable = document.getElementById("pollutantsTable");
 
-// Add event listeners to buttons
-pollutionBtn.addEventListener("click", function () {
-    pollutionBtn.classList.add("active");    // Add active class to Pollution button
-    companiesBtn.classList.remove("active");    // Remove active class to Pollution button
-    pollutantsBtn.classList.remove("active");    // Remove active class to Pollution button
+function filterTable() {
+    const companyFilter = document.getElementById("companyFilter").value.toLowerCase();
+    const pollutantFilter = document.getElementById("pollutantFilter").value.toLowerCase();
+    const yearFilter = document.getElementById("yearFilter").value;
 
-    pollutionTable.style.display = "block"; // Show Pollution table
-    companiesTable.style.display = "none";   // Hide Companies table
-    pollutantsTable.style.display = "none";   // Hide Pollutants table
-});
+    const rows = document.querySelectorAll("#rowData");
 
-companiesBtn.addEventListener("click", function () {
-    pollutionBtn.classList.remove("active");    // Add active class to Pollution button
-    companiesBtn.classList.add("active");    // Add active class to Pollution button
-    pollutantsBtn.classList.remove("active");    // Add active class to Pollution button
+    rows.forEach(function (row) {
+        const company = row.querySelector("td:nth-child(1)").innerHTML.toLowerCase();
+        const pollutant = row.querySelector("td:nth-child(2)").innerHTML.toLowerCase();
+        const year = row.querySelector("td:nth-child(10)").innerHTML;
 
-    pollutionTable.style.display = "none";   // Hide Pollution table
-    companiesTable.style.display = "block";  // Show Companies table
-    pollutantsTable.style.display = "none";   // Hide Pollutants table
-});
-
-pollutantsBtn.addEventListener("click", function () {
-    pollutionBtn.classList.remove("active");    // Add active class to Pollution button
-    companiesBtn.classList.remove("active");    // Remove active class to Pollution button
-    pollutantsBtn.classList.add("active");    // Remove active class to Pollution button
-
-    pollutionTable.style.display = "none";   // Hide Pollution table
-    companiesTable.style.display = "none";   // Hide Companies table
-    pollutantsTable.style.display = "block";  // Show Pollutants table
-});
+        if (
+            company.includes(companyFilter) &&
+            pollutant.includes(pollutantFilter) &&
+            (yearFilter === "" || year === yearFilter)
+        ) {
+            row.style.display = "";
+        } else {
+            row.style.display = "none";
+        }
+    });
+}
