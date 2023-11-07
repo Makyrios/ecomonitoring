@@ -30,12 +30,10 @@
     </div>
 
     <div class="lr_table">
-        <!-- Pollutants Table -->
         <div class="table-container" id="pollutantsTable">
             <h1>Забруднення та податки</h1>
-            {{!-- <button id="calculateTaxesBtn" class="b-button" onclick="calculateTaxes()">Розрахувати податки</button> --}}
             <div class="total-taxes">
-                <p>Загальна сума податків: <span id="totalTaxesAmount">0</span></p>
+                <p>Загальна сума податків: <span id="totalTaxesAmount"></span></p>
             </div>
             <table class="lr_table-container" id="pollutionTable">
                 <tr class="lr_table-tr tr-header">
@@ -53,7 +51,6 @@
                         <br><br><input type="number" id="yearFilter" oninput="filterTable()" class="filter-input-disabled" />
                     </th>
                     <th>Податок, грн</th>
-                    {{!-- <th>Дії</th> --}}
                 </tr>
                 {{#each pollution}}
                 <tr id="rowData">
@@ -63,24 +60,9 @@
                     <td>{{checkValue this.tax_rate}}</td>
                     <td>{{this.date}}</td>
                     <td>{{checkValue (toFixed (multiply this.amountpollution this.tax_rate) 2)}}</td>
-                    {{!--
-                    <td class="action-cell">
-                        <div class="actions-container">
-                            <form action="/edittaxes/{{this.idpollutant}}" method="GET" style="display:inline;">
-                                <input type="submit" value="Редагувати" class="edit-button">
-                            </form>
-                            {{!-- <form action="/deletetaxes/{{this.idpollutant}}" method="POST" style="display:inline;">
-                                <input type="submit" value="Видалити" class="delete-button">
-                            </form>
-                        </div>
-                    </td>
-                    --}}
                 </tr>
                 {{/each}}
             </table>
-            <div class="add-company-button-container">
-                <a href="/add-pollutant" class="company-button add-company-button-text">Додати забруднюючу речовину</a>
-            </div>
         </div>
     </div>
 

@@ -1,52 +1,3 @@
-function checkValue(val) {
-    if (val < 0 || val == null || val == NaN) {
-        return '-';
-      }
-    return val;
-}
-
-function calculateTaxes() {
-    let taxSum = 0;
-
-    // Отримайте всі рядки (таблиці) в таблиці "pollutionTable"
-    var rows = document.querySelectorAll("#pollutionTable tr:not(.hidden)");
-  
-    // Пропустіть перший рядок, оскільки це заголовок таблиці
-    for (var i = 1; i < rows.length; i++) {
-      // Отримайте комірку "Усього викидів підприємства, т/рік"
-      var amountCell = rows[i].querySelector("td:nth-child(3)");
-  
-      // Отримайте комірку "Ставка податку для речовини"
-      var rateCell = rows[i].querySelector("td:nth-child(4)");
-  
-      // Отримайте комірку "Податок"
-      var taxCell = rows[i].querySelector("td:nth-child(6)");
-  
-      // Перевірте, чи всі необхідні комірки існують
-      if (amountCell && rateCell && taxCell) {
-
-        if (amountCell.textContent == '-' || rateCell.textContent == '-') {
-          taxCell.textContent = '-';
-          continue;
-        }
-
-        // Отримайте значення "Усього викидів підприємства, т/рік" та "Ставка податку для речовини"
-        var amount = parseFloat(amountCell.textContent);
-        var rate = parseFloat(rateCell.textContent);
-  
-        // Розрахуйте податок (множення викидів на ставку)
-        var tax = amount * rate;
-
-        taxSum += tax;
-  
-        // Встановіть результат у комірку "Податок"
-        taxCell.textContent = tax;
-      }
-    }
-    document.getElementById('totalTaxesAmount').textContent = taxSum;
-  }
-
-
 function calculateTaxSum() {
   let taxesSum = document.getElementById('totalTaxesAmount');
   let taxes = document.querySelectorAll("#pollutionTable tr:not(.hidden) td:nth-child(6)");
@@ -98,7 +49,6 @@ function filterTable() {
         }
     });
 
-    // calculateTaxes();
     calculateTaxSum();
 }
 

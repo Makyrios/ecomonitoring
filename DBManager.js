@@ -11,6 +11,13 @@ const dotenv = require('dotenv').config({
 
 const urlencodedParser = express.urlencoded({ extended: false });
 
+// Taxes constants
+const FIRST_LEVEL_TAX = 17536.42;
+const SECOND_LEVEL_TAX = 4016.11;
+const THIRD_LEVEL_TAX = 598.4;
+const FOURTH_LEVEL_TAX = 138.57;
+
+
 hbs.registerHelper('divide', (a, b) => a / b);
 hbs.registerHelper('multiply', (a, b) => a * b);
 hbs.registerHelper('gt', (a, b) => a > b);
@@ -284,7 +291,22 @@ app.post("/add-pollutant", urlencodedParser, function (req, res) {
   const rfc = req.body.rfc;
   const sf = req.body.sf;
   const danger = req.body.danger;
-  const tax_rate = req.body.tax_rate;
+  let tax_rate = req.body.tax_rate;
+  // If tax_rate is nog given use constants
+  if (tax_rate == null || tax_rate < 0) {
+    if (danger == 1) {
+      tax_rate = FIRST_LEVEL_TAX;
+    }
+    else if (danger == 2) {
+      tax_rate = SECOND_LEVEL_TAX;
+    }
+    else if (danger == 3) {
+      tax_rate = THIRD_LEVEL_TAX;
+    }
+    else if (danger == 4) {
+      tax_rate = FOURTH_LEVEL_TAX;
+    }
+  }
 
   connection.query("INSERT INTO pollutant(name, mass_flow_rate, tlv, rfc, sf, danger, tax_rate) VALUES (?, ?, ?, ?, ?, ?, ?) as newpol " +
     "ON DUPLICATE KEY UPDATE mass_flow_rate = newpol.mass_flow_rate, tlv = newpol.tlv, rfc=newpol.rfc, sf=newpol.sf, danger = newpol.danger, tax_rate=newpol.tax_rate",
@@ -337,7 +359,22 @@ app.post("/editpollutant", urlencodedParser, function (req, res) {
   const rfc = req.body.rfc;
   const sf = req.body.sf;
   const danger = req.body.danger;
-  const tax_rate = req.body.tax_rate
+  let tax_rate = req.body.tax_rate;
+  // If tax_rate is nog given use constants
+  if (tax_rate == null || tax_rate < 0) {
+    if (danger == 1) {
+      tax_rate = FIRST_LEVEL_TAX;
+    }
+    else if (danger == 2) {
+      tax_rate = SECOND_LEVEL_TAX;
+    }
+    else if (danger == 3) {
+      tax_rate = THIRD_LEVEL_TAX;
+    }
+    else if (danger == 4) {
+      tax_rate = FOURTH_LEVEL_TAX;
+    }
+  }
 
   connection.query("UPDATE pollutant SET mass_flow_rate = ?, tlv = ?, rfc = ?, sf = ?, danger = ?, tax_rate = ? \
    WHERE idpollutant = ?", [mass_flow_rate, tlv, rfc, sf, danger, tax_rate, idpollutant], function (err, data) {
@@ -473,7 +510,22 @@ function importFileToPollutantDb(exFile) {
       const rfc = rows[i][3];
       const sf = rows[i][4];
       const danger = rows[i][5];
-      const tax_rate = rows[i][6];
+      let tax_rate = rows[i][6];
+      // If tax_rate is nog given use constants
+      if (tax_rate == null || tax_rate < 0) {
+        if (danger == 1) {
+          tax_rate = FIRST_LEVEL_TAX;
+        }
+        else if (danger == 2) {
+          tax_rate = SECOND_LEVEL_TAX;
+        }
+        else if (danger == 3) {
+          tax_rate = THIRD_LEVEL_TAX;
+        }
+        else if (danger == 4) {
+          tax_rate = FOURTH_LEVEL_TAX;
+        }
+      }
 
       connection.query("INSERT INTO pollutant(name, mass_flow_rate, tlv, rfc, sf, danger, tax_rate) VALUES (?, ?, ?, ?, ?, ?, ?) as newpol " +
         "ON DUPLICATE KEY UPDATE mass_flow_rate = newpol.mass_flow_rate, tlv = newpol.tlv, rfc=newpol.rfc, sf = newpol.sf, danger = newpol.danger, tax_rate = newpol.tax_rate",
