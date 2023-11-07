@@ -26,7 +26,7 @@ hbs.registerHelper('toFixed', (a, b) => parseFloat(a).toFixed(b));
 hbs.registerHelper('distFixed', (dist) => parseFloat(dist).toFixed(3));
 hbs.registerHelper('crFixed', (dist) => parseFloat(dist).toFixed(8));
 hbs.registerHelper('checkValue', function (value) {
-  if (value < 0 || value == null || value == 0) {
+  if (value < 0 || value == null) {
     return '-';
   }
   return value;
