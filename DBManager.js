@@ -31,6 +31,12 @@ hbs.registerHelper('checkValue', function (value) {
   }
   return value;
 });
+hbs.registerHelper('checkValueNull', function (value) {
+  if (value < 0 || value == null || value == 0) {
+    return '-';
+  }
+  return value;
+});
 hbs.registerHelper('riskHQColor', function (value) {
   if (value < 0) {
     return "";

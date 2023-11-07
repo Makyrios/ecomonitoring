@@ -59,7 +59,7 @@
                     <td>{{this.amountpollution}}</td>
                     <td>{{checkValue this.tax_rate}}</td>
                     <td>{{this.date}}</td>
-                    <td>{{checkValue (toFixed (multiply this.amountpollution this.tax_rate) 2)}}</td>
+                    <td>{{checkValueNull (toFixed (multiply this.amountpollution this.tax_rate) 2)}}</td>
                 </tr>
                 {{/each}}
             </table>
