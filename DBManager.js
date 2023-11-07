@@ -15,10 +15,11 @@ hbs.registerHelper('divide', (a, b) => a / b);
 hbs.registerHelper('multiply', (a, b) => a * b);
 hbs.registerHelper('gt', (a, b) => a > b);
 hbs.registerHelper('subtract', (a, b) => a - b);
+hbs.registerHelper('toFixed', (a, b) => parseFloat(a).toFixed(b));
 hbs.registerHelper('distFixed', (dist) => parseFloat(dist).toFixed(3));
 hbs.registerHelper('crFixed', (dist) => parseFloat(dist).toFixed(8));
 hbs.registerHelper('checkValue', function (value) {
-  if (value < 0 || value == null) {
+  if (value < 0 || value == null || value == 0) {
     return '-';
   }
   return value;
@@ -57,12 +58,6 @@ hbs.registerHelper('riskCRColor', function (value) {
   }
 });
 
-// hbs.registerHelper('calculateAddLadd', (Ca) => {
-//   BW = 60, daysInYear = 365,
-//   Tout = 1.64, Tin = 19.69, AT = 70,
-//   Vout = 0.63, Vin = 0.5, ED = 70;
-//   return (((Ca*Tout*Vout)+(Ca*Tin*Vin))*daysInYear*ED)/(BW*AT*daysInYear);
-// });
 
 function calculateAddLadd(Ca) {
   BW = 65, EF = 350,
@@ -149,6 +144,20 @@ app.get("/pollutant", function (req, res) {
     }
     res.render("pollutant.hbs", {
       pollutant: pollutants
+    });
+  });
+});
+
+app.get("/taxes", function (req, res) {
+  connection.query(
+  "SELECT c.name AS company_name, ptant.name AS pollutant_name, p.amountpollution, ptant.tax_rate, p.date FROM pollution p\
+  INNER JOIN company c ON p.idcompany = c.idcompany\
+  INNER JOIN pollutant ptant ON p.idpollutant = ptant.idpollutant ORDER BY p.idpollution;", (err, pollutions) => {
+    if (err) {
+      console.log(err);
+    }
+    res.render("taxes.hbs", {
+      pollution: pollutions
     });
   });
 });
@@ -275,9 +284,11 @@ app.post("/add-pollutant", urlencodedParser, function (req, res) {
   const rfc = req.body.rfc;
   const sf = req.body.sf;
   const danger = req.body.danger;
+  const tax_rate = req.body.tax_rate;
 
-  connection.query("INSERT INTO pollutant(name, mass_flow_rate, tlv, rfc, sf danger) VALUES (?, ?, ?, ?, ?, ?) as newpol " +
-    "ON DUPLICATE KEY UPDATE mass_flow_rate = newpol.mass_flow_rate, tlv = newpol.tlv, rfc=newpol.rfc, sf=newpol.sf danger = newpol.danger", [pollutant_name, mass_flow_rate, tlv, rfc, sf, danger],
+  connection.query("INSERT INTO pollutant(name, mass_flow_rate, tlv, rfc, sf, danger, tax_rate) VALUES (?, ?, ?, ?, ?, ?, ?) as newpol " +
+    "ON DUPLICATE KEY UPDATE mass_flow_rate = newpol.mass_flow_rate, tlv = newpol.tlv, rfc=newpol.rfc, sf=newpol.sf, danger = newpol.danger, tax_rate=newpol.tax_rate",
+    [pollutant_name, mass_flow_rate, tlv, rfc, sf, danger, tax_rate],
     function (err, data) {
       if (err) {
         throw err;
@@ -325,9 +336,11 @@ app.post("/editpollutant", urlencodedParser, function (req, res) {
   const tlv = req.body.tlv;
   const rfc = req.body.rfc;
   const sf = req.body.sf;
+  const danger = req.body.danger;
+  const tax_rate = req.body.tax_rate
 
-  connection.query("UPDATE pollutant SET mass_flow_rate = ?, tlv = ?, rfc = ?, sf = ? \
-   WHERE idpollutant = ?", [mass_flow_rate, tlv, rfc, sf, idpollutant], function (err, data) {
+  connection.query("UPDATE pollutant SET mass_flow_rate = ?, tlv = ?, rfc = ?, sf = ?, danger = ?, tax_rate = ? \
+   WHERE idpollutant = ?", [mass_flow_rate, tlv, rfc, sf, danger, tax_rate, idpollutant], function (err, data) {
       if (err) return console.log(err);
       res.redirect("/pollutant");
     });
@@ -459,12 +472,12 @@ function importFileToPollutantDb(exFile) {
       const tlv = rows[i][2];
       const rfc = rows[i][3];
       const sf = rows[i][4];
-      console.log(sf);
       const danger = rows[i][5];
+      const tax_rate = rows[i][6];
 
-      connection.query("INSERT INTO pollutant(name, mass_flow_rate, tlv, rfc, sf, danger) VALUES (?, ?, ?, ?, ?, ?) as newpol " +
-        "ON DUPLICATE KEY UPDATE mass_flow_rate = newpol.mass_flow_rate, tlv = newpol.tlv, rfc=newpol.rfc, sf=newpol.sf, danger = newpol.danger",
-         [pollutantName, mass_flow_rate, tlv, rfc, sf, danger], function (err, data) {
+      connection.query("INSERT INTO pollutant(name, mass_flow_rate, tlv, rfc, sf, danger, tax_rate) VALUES (?, ?, ?, ?, ?, ?, ?) as newpol " +
+        "ON DUPLICATE KEY UPDATE mass_flow_rate = newpol.mass_flow_rate, tlv = newpol.tlv, rfc=newpol.rfc, sf = newpol.sf, danger = newpol.danger, tax_rate = newpol.tax_rate",
+         [pollutantName, mass_flow_rate, tlv, rfc, sf, danger, tax_rate], function (err, data) {
           if (err) {
             throw err;
           }

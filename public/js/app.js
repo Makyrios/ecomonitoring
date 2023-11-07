@@ -37,6 +37,7 @@ function filterTable() {
     });
 }
 
+// Popup window for color info
 const HQ = document.getElementById("HQ");
 const CR = document.getElementById("CR");
 

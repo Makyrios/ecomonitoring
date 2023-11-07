@@ -5,11 +5,11 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="css/style.css" rel="stylesheet">
-    <title>ЛР2</title>
+    <title>ЛР4</title>
 </head>
 <body>
     <div class="header">
-        <h1><b>Лабораторна робота №2</b></h1>
+        <h1><b>Лабораторна робота №4</b></h1>
         <h2>Виконали студенти ТР-13 Лавренюк Микита та Смолянчук Дарина</h2>
     </div>
 
@@ -22,6 +22,9 @@
             <button id="companiesBtn" class="b-button">Підприємства</button>
         </form>
         <button id="pollutantsBtn" class="active b-button" disabled>Забруднюючі речовини</button>
+        <form action="/taxes" method="GET">
+            <button id="taxesBtn" class="b-button">Податки</button>
+        </form>
     </div>
 
     <div class="lr_table">
@@ -37,6 +40,7 @@
                     <th>Референтна концентрація (RfC) мг/м³</th>
                     <th>Фактор нахилу (SF) мг/(кг * доба)</th>
                     <th>Клас небезпеки</th>
+                    <th>Ставки податку за викиди в атмосферне повітря окремих забруднюючих речовин стаціонарними джерелами забруднення</th>
                     <th>Дії</th>
                 </tr>
                 {{#each pollutant}}
@@ -48,6 +52,7 @@
                     <td>{{checkValue this.rfc}}</td>
                     <td>{{checkValue this.sf}}</td>
                     <td>{{checkValue this.danger}}</td>
+                    <td>{{checkValue this.tax_rate}}</td>
                     <td class="action-cell">
                         <div class="actions-container">
                             <form action="/editpollutant/{{this.idpollutant}}" method="GET" style="display:inline;">
