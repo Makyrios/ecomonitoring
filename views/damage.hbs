@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="/css/taxes.css" rel="stylesheet">
-    <title>ЛР4</title>
+    <link href="/css/damage.css" rel="stylesheet">
+    <title>ЛР3</title>
 </head>
 <body>
     <div class="header">
-        <h1><b>Лабораторна робота №4</b></h1>
+        <h1><b>Лабораторна робота №3</b></h1>
         <h2>Виконали студенти ТР-13 Лавренюк Микита та Смолянчук Дарина</h2>
     </div>
 
@@ -25,50 +25,57 @@
             <button id="pollutantsBtn" class="b-button">Забруднюючі речовини</button>
         </form>
         <form action="/taxes" method="GET">
-            <button id="taxesBtn" class="active b-button" disabled>Податки</button>
+            <button id="taxesBtn" class="b-button">Податки</button>
         </form>
         <form action="/damage" method="GET">
-            <button id="damageBtn" class="b-button">Збитки</button>
+            <button id="taxesBtn" class="active b-button" disabled>Збитки</button>
         </form>
     </div>
 
     <div class="lr_table">
         <div class="table-container" id="pollutantsTable">
-            <h1>Забруднення та податки</h1>
-            <div class="total-taxes">
-                <p>Загальна сума податків: <span id="totalTaxesAmount"></span></p>
+            <h1>Збитки</h1>
+            <div class="total-damage">
+                <p>Загальна сума збитків: <span id="totalDamageAmount"></span></p>
             </div>
             <table class="lr_table-container" id="pollutionTable">
                 <tr class="lr_table-tr tr-header">
-                    <th style="min-width: 150px;"><a id="companyNameTh" onclick="toggleFilter('companyFilter', 'companyNameTh')" style="cursor:pointer;">Назва підприємства ▼</a>
+                    <th rowspan="2" style="min-width: 150px;"><a id="companyNameTh" onclick="toggleFilter('companyFilter', 'companyNameTh')" style="cursor:pointer;">Назва підприємства ▼</a>
                         <br><br>
                         <input type="text" id="companyFilter" oninput="filterTable()" class="filter-input-disabled" />
                     </th>
-                    <th><a id="pollutantNameTh" onclick="toggleFilter('pollutantFilter', 'pollutantNameTh')" style="cursor:pointer;">Назва забруднюючої речовини ▼</a>
+                    <th rowspan="2"><a id="pollutantNameTh" onclick="toggleFilter('pollutantFilter', 'pollutantNameTh')" style="cursor:pointer;">Назва забруднюючої речовини ▼</a>
                         <br><br>
                         <input type="text" id="pollutantFilter" oninput="filterTable()" class="filter-input-disabled" />
                     </th>
-                    <th>Усього викидів підприємства, т/рік</th>
-                    <th>Ставки податку за викиди в атмосферне повітря окремих забруднюючих речовин стаціонарними джерелами забруднення</th>
-                    <th style="min-width: 80px;"><a id="yearTh" onclick="toggleFilter('yearFilter', 'yearTh')" style="cursor:pointer;">Період ▼</a>
+                    <th rowspan="2">Усього викидів підприємства, т/рік</th>
+                    <th rowspan="2">Концентрація, мг/м³</th>
+                    <th colspan="2">Нормативи ГДВ забруднюючих речовин</th>
+                    <th rowspan="2" style="min-width: 80px;"><a id="yearTh" onclick="toggleFilter('yearFilter', 'yearTh')" style="cursor:pointer;">Період ▼</a>
                         <br><br><input type="number" id="yearFilter" oninput="filterTable()" class="filter-input-disabled" />
                     </th>
-                    <th>Податок, грн</th>
+                    <th rowspan="2">Збитки, грн</th>
+                </tr>
+                <tr class="lr_table-tr tr-header">
+                    <th>Величина масової витрати, т/рік</th>
+                    <th>Гранично допустимі викиди, мг/м3</th>
                 </tr>
                 {{#each pollution}}
                 <tr id="rowData">
                     <td>{{this.company_name}}</td>
                     <td>{{this.pollutant_name}}</td>
                     <td>{{this.amountpollution}}</td>
-                    <td>{{checkValue this.tax_rate}}</td>
+                    <td>{{this.concentration}}</td>
+                    <td>{{checkValue (distFixed (divide this.mass_flow_rate 114.1552))}}</td>
+                    <td>{{checkValue this.tlv}}</td>
                     <td>{{this.date}}</td>
-                    <td>{{checkValueNull (toFixed (multiply this.amountpollution this.tax_rate) 2)}}</td>
+                    <td>{{checkValue (toFixed (calculateDamage this.amountpollution this.mass_flow_rate this.concentration this.tlv) 2)}}</td>
                 </tr>
                 {{/each}}
             </table>
         </div>
     </div>
 
-    <script src="/js/taxes.js"></script>
+    <script src="/js/damage.js"></script>
 </body>
 </html>

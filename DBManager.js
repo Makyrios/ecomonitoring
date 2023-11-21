@@ -93,6 +93,40 @@ hbs.registerHelper('calculateCr', (Ca, SF) => {
   return calculateAddLadd(Ca) * SF;
 });
 
+function GetMi(qmi, qnorm, t) {
+  console.log("qmi " + qmi);
+  console.log("qnorm " + qnorm);
+  return 3.6 * Math.pow(10, -3) * (qmi - qnorm) * t;
+}
+
+hbs.registerHelper('calculateDamage', (mass, mfr, concentration, tlv) => {
+  if (mass <= 0 || mfr <= 0 || tlv <= 0) {
+    return '-1';
+  }
+  console.log("mass " + mass);
+  console.log("mfr " + mfr);
+  if (mass <= mfr / 114.1552) {
+    return '-1';
+  }
+  minWage = 6700;
+  Ai = 1;
+  if (tlv > 1) {
+    Ai = 10 / tlv;
+  }
+  else {
+    Ai = 1 / tlv;
+  }
+  Knas = 1.80;
+  Kf = 1.25
+  Kt = Knas * Kf;
+  Kzi = 1;
+  if (concentration > 0 && concentration > tlv) {
+    Kzi = concentration / tlv;
+  }
+  t = 8760;
+  return GetMi(mass * 0.031709, mfr / 3600, t) * minWage * Ai * Kt * Kzi;
+});
+
 app.set("view engine", "hbs");
 
 app.use(express.static(__dirname + '/public'));
@@ -161,19 +195,6 @@ app.get("/pollutant", function (req, res) {
   });
 });
 
-app.get("/taxes", function (req, res) {
-  connection.query(
-  "SELECT c.name AS company_name, ptant.name AS pollutant_name, p.amountpollution, ptant.tax_rate, p.date FROM pollution p\
-  INNER JOIN company c ON p.idcompany = c.idcompany\
-  INNER JOIN pollutant ptant ON p.idpollutant = ptant.idpollutant ORDER BY p.idpollution;", (err, pollutions) => {
-    if (err) {
-      console.log(err);
-    }
-    res.render("taxes.hbs", {
-      pollution: pollutions
-    });
-  });
-});
 
 app.get('/companies', (req, res) => {
   connection.query("SELECT * FROM company", (err, results) => {
@@ -190,6 +211,34 @@ app.get('/pollutants', (req, res) => {
       throw err;
     }
     res.json(results);
+  });
+});
+
+app.get("/taxes", function (req, res) {
+  connection.query(
+  "SELECT c.name AS company_name, ptant.name AS pollutant_name, p.amountpollution, ptant.tax_rate, p.date FROM pollution p\
+  INNER JOIN company c ON p.idcompany = c.idcompany\
+  INNER JOIN pollutant ptant ON p.idpollutant = ptant.idpollutant ORDER BY p.idpollution;", (err, pollutions) => {
+    if (err) {
+      console.log(err);
+    }
+    res.render("taxes.hbs", {
+      pollution: pollutions
+    });
+  });
+});
+
+app.get("/damage", function (req, res) {
+  connection.query(
+  "SELECT c.name AS company_name, ptant.name AS pollutant_name, p.amountpollution, p.concentration, ptant.mass_flow_rate, ptant.tlv, p.date FROM pollution p\
+  INNER JOIN company c ON p.idcompany = c.idcompany\
+  INNER JOIN pollutant ptant ON p.idpollutant = ptant.idpollutant ORDER BY p.idpollution;", (err, pollutions) => {
+    if (err) {
+      console.log(err);
+    }
+    res.render("damage.hbs", {
+      pollution: pollutions
+    });
   });
 });
 
