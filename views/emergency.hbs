@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/emergency.css" rel="stylesheet">
+    <title>ЛР5</title>
+</head>
+<body>
+    <div class="header">
+        <h1><b>Лабораторна робота №5</b></h1>
+        <h2>Виконали студенти ТР-13 Лавренюк Микита та Смолянчук Дарина</h2>
+    </div>
+
+
+    <div class="buttons">
+        <form action="/" method="GET">
+            <button id="pollutionBtn" class="b-button">Надзвичайні ситуації</button>
+        </form>
+        <button id="companiesBtn" class="b-button">Підприємства</button>
+        <form action="/pollutant" method="GET">
+            <button id="pollutantsBtn" class="b-button">Забруднюючі речовини</button>
+        </form>
+        <form action="/taxes" method="GET">
+            <button id="taxesBtn" class="b-button">Податки</button>
+        </form>
+        <form action="/damage" method="GET">
+            <button id="damageBtn" class="b-button">Збитки</button>
+        </form>
+        <form action="/emergency" method="GET">
+            <button id="emergencyBtn" class="active b-button" disabled>Надзвичайні ситуації</button>
+        </form>
+    </div>
+
+
+    <h1>Надзвичайні ситуації</h1>
+    <div class="total-lossess">
+        <p>Загальна сума податків: <span id="totalLossessAmount"></span></p>
+    </div>
+    <div class="lr_table">
+        <div class="table-container" id="emergenciesTable">
+            <table class="lr_table-container" id="pollutionTable">
+                <tr class="lr_table-tr tr-header">
+                    <th>ID</th>
+                    <th>Надзвичайна ситуація</th>
+                    <th style="min-width: 150px;"><a id="companyNameTh" onclick="toggleFilter('companyFilter', 'companyNameTh')" style="cursor:pointer;">Назва підприємства ▼</a>
+                        <br><br>
+                        <input type="text" id="companyFilter" oninput="filterTable()" class="filter-input-disabled" />
+                    </th>
+                    <th style="min-width: 80px;"><a id="yearTh" onclick="toggleFilter('yearFilter', 'yearTh')" style="cursor:pointer;">Період ▼</a>
+                        <br><br><input type="number" id="yearFilter" oninput="filterTable()" class="filter-input-disabled" />
+                    </th>
+                    <th>Збитки від руйнування та пошкодження основних фондів виробничого призначення, грн</th>
+                    <th>Збитки від руйнування та пошкодження основних фондів невиробничого призначення, грн</th>
+                    <th>Збитки від втрат готової промислової та сільськогосподарської продукції, грн</th>
+                    <th>Збитки від втрат незібраної сільськогосподарської продукції, грн</th>
+                    <th>Збитки від втрат запасів сировини, напівфабрикатів та проміжної продукції, грн</th>
+                    <th>Збитки від втрат майна громадян та організацій, грн</th>
+                    <th>Кількість легких нещасних випадків</th>
+                    <th>Кількість тяжких нещасних випадків</th>
+                    <th>Кількість отриманих інвалідностей</th>
+                    <th>Кількість загиблих</th>
+                    {{!-- <th>Маса викинутої забруднюючої речовини, т</th> --}}
+                    <th>Збитки від руйнування та втрат, грн</th>
+                    <th>Збитки від втрати життя та здоров'я населення, грн</th>
+                    <th>Загальні збитки, грн</th>
+                    {{!-- <th>Збитки від забруднення атмосферного повітря, грн</th> --}}
+                    <th>Дії</th>
+
+                </tr>
+                {{#each emergency}}
+                <tr id="rowData">
+                    <td>{{this.idemergency}}</td>
+                    <td>{{this.emergency_name}}</td>
+                    <td>{{this.company_name}}</td>
+                    <td>{{this.emergency_date}}</td>
+                    <td>{{this.fv}}</td>
+                    <td>{{this.fg}}</td>
+                    <td>{{this.pr}}</td>
+                    <td>{{this.prs}}</td>
+                    <td>{{this.sn}}</td>
+                    <td>{{this.mdg}}</td>
+                    <td>{{this.mln}}</td>
+                    <td>{{this.mtn}}</td>
+                    <td>{{this.min}}</td>
+                    <td>{{this.mzn}}</td>
+                    <td>{{toFixed (calculateLossess this.fv this.fg this.pr this.prs this.sn this.mdg) 2}}</td> 
+                    <td>{{toFixed (calculateHealthLossess this.mln this.mtn this.min this.mzn) 2}}</td>
+                    <td>{{toFixed (add (calculateLossess this.fv this.fg this.pr this.prs this.sn this.mdg) (calculateHealthLossess this.mln this.mtn this.min this.mzn)) 2}}</td>
+
+                    <td class="action-cell">
+                        <div class="actions-container">
+                            <form action="/editemergency/{{this.idemergency}}" method="GET" style="display:inline;">
+                                <input type="submit" value="Редагувати" class="edit-button">
+                            </form>
+                            <form action="/deleteemergency/{{this.idemergency}}" method="POST" style="display:inline;">
+                                <input type="submit" value="Видалити" class="delete-button">
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {{/each}}
+            </table>
+        </div>
+    </div>
+    <div class="add-emergency-button-container">
+        <a href="/add-emergency" class="emergency-button add-emergency-button-text">Додати надзвичайну ситуацію</a>
+    </div>
+
+    <script src="/js/emergency.js"></script>
+</body>
+</html>

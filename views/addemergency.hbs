@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <link href="/css/add.css" rel="stylesheet">
+   <title>Додати надзвичайну ситуацію</title>
+
+   <script>
+   fetch('/companies')
+   .then((response) => response.json())
+   .then((data) => {
+      const companySelect = document.getElementById('company_select');
+      data.forEach((company) => {
+         const option = document.createElement('option');
+         option.value = company.idcompany;
+         option.textContent = company.name;
+         companySelect.appendChild(option);
+      });
+   });
+   </script>
+</head>
+<body>
+   <h1>Додати надзвичайну ситуацію</h1>
+   <div class="add-field">
+      <div class="form-column">
+         <form action="/add-emergency" method="POST">
+            <h4>Надзвичайна ситуація</h4><br>
+            <input name="emergency_name" class="field">
+            <h4>Назва підприємства</h4><br>
+            <select name="idcompany" id="company_select" class="field"> 
+            </select><br><br>
+
+            <h4>Дата</h4><br>
+            <input name="emergency_date" value="{{emergency.date}}" class="field"><br><br>
+            <h4>Збитки від руйнування та пошкодження основних фондів виробничого призначення, грн</h4><br>
+            <input name="fv" class="field"><br><br>
+            <h4>Збитки від руйнування та пошкодження основних фондів невиробничого призначення, грн</h4><br>
+            <input name="fg" class="field"><br><br>
+            <h4>Збитки від втрат готової промислової та сільськогосподарської продукції, грн</h4><br>
+            <input name="pr" class="field"><br><br>
+            <h4>Збитки від втрат незібраної сільськогосподарської продукції, грн</h4><br>
+            <input name="prs" class="field"><br><br>
+            <h4>Збитки від втрат запасів сировини, напівфабрикатів та проміжної продукції, грн</h4><br>
+            <input name="sn" class="field"><br><br>
+            <h4>Збитки від втрат майна громадян та організацій, грн</h4><br>
+            <input name="mdg" class="field"><br><br>
+            <h4>Кількість легких нещасних випадків</h4><br>
+            <input name="mln" class="field"><br><br>
+            <h4>Кількість тяжких нещасних випадків</h4><br>
+            <input name="mtn" class="field"><br><br>
+            <h4>Кількість отриманих інвалідностей</h4><br>
+            <input name="min" class="field"><br><br>
+            <h4>Кількість загиблих</h4><br>
+            <input name="mzn" class="field"><br><br>
+
+            <input type="submit" value="Додати" class="submit-button">
+         </form>
+
+         <form action="/import-emergency" enctype="multipart/form-data" method="POST">
+            <label for="import-emergency" class="submit-button">
+               <input class="hidden"
+               type="file"
+               name="import-emergency-file"
+               id="import-emergency"
+               accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+               onchange="this.form.submit()">
+            Імпортувати дані з Excel файлу
+            </label>
+         </form>
+      </div>
+   </div>
+   <a href="/emergency" class="back-button">До таблиці</a>
+</body>
+</html>

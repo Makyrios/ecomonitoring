@@ -21,6 +21,7 @@ const FOURTH_LEVEL_TAX = 138.57;
 hbs.registerHelper('divide', (a, b) => a / b);
 hbs.registerHelper('multiply', (a, b) => a * b);
 hbs.registerHelper('gt', (a, b) => a > b);
+hbs.registerHelper('add', (a, b) => a + b);
 hbs.registerHelper('subtract', (a, b) => a - b);
 hbs.registerHelper('toFixed', (a, b) => parseFloat(a).toFixed(b));
 hbs.registerHelper('distFixed', (dist) => parseFloat(dist).toFixed(3));
@@ -94,8 +95,6 @@ hbs.registerHelper('calculateCr', (Ca, SF) => {
 });
 
 function GetMi(qmi, qnorm, t) {
-  console.log("qmi " + qmi);
-  console.log("qnorm " + qnorm);
   return 3.6 * Math.pow(10, -3) * (qmi - qnorm) * t;
 }
 
@@ -103,8 +102,6 @@ hbs.registerHelper('calculateDamage', (mass, mfr, concentration, tlv) => {
   if (mass <= 0 || mfr <= 0 || tlv <= 0) {
     return '-1';
   }
-  console.log("mass " + mass);
-  console.log("mfr " + mfr);
   if (mass <= mfr / 114.1552) {
     return '-1';
   }
@@ -125,6 +122,15 @@ hbs.registerHelper('calculateDamage', (mass, mfr, concentration, tlv) => {
   }
   t = 8760;
   return GetMi(mass * 0.031709, mfr / 3600, t) * minWage * Ai * Kt * Kzi;
+});
+
+hbs.registerHelper('calculateLossess', (fv, fg, pr, prs, sn, mdg) => {
+  return parseFloat(fv) + parseFloat(fg) + parseFloat(pr) + parseFloat(prs) + parseFloat(sn) + parseFloat(mdg);
+});
+
+hbs.registerHelper('calculateHealthLossess', (mln, mtn, min, mzn) => {
+  return (0.28 * parseFloat(mln) + 6.5 * parseFloat(mtn) + 37 * parseFloat(min) + 47 * parseFloat(mzn)) * 1000 +
+         (12 * 0.15 * parseFloat(mzn)) * 1000;
 });
 
 app.set("view engine", "hbs");
@@ -195,25 +201,6 @@ app.get("/pollutant", function (req, res) {
   });
 });
 
-
-app.get('/companies', (req, res) => {
-  connection.query("SELECT * FROM company", (err, results) => {
-    if (err) {
-      throw err;
-    }
-    res.json(results);
-  });
-});
-
-app.get('/pollutants', (req, res) => {
-  connection.query("SELECT * FROM pollutant", (err, results) => {
-    if (err) {
-      throw err;
-    }
-    res.json(results);
-  });
-});
-
 app.get("/taxes", function (req, res) {
   connection.query(
   "SELECT c.name AS company_name, ptant.name AS pollutant_name, p.amountpollution, ptant.tax_rate, p.date FROM pollution p\
@@ -242,6 +229,48 @@ app.get("/damage", function (req, res) {
   });
 });
 
+app.get("/emergency", function (req, res) {
+  connection.query(
+  "SELECT idemergency, e.name AS emergency_name, c.name AS company_name, e.date AS emergency_date, \
+  fv, fg, pr, prs, sn, mdg, mln, mtn, min, mzn FROM emergency e\
+  INNER JOIN company c ON e.idcompany = c.idcompany\
+  ORDER BY e.idemergency;", (err, emergencies) => {
+    if (err) {
+      console.log(err);
+    }
+    res.render("emergency.hbs", {
+      emergency: emergencies
+    });
+  });
+});
+
+app.get('/companies', (req, res) => {
+  connection.query("SELECT * FROM company", (err, results) => {
+    if (err) {
+      throw err;
+    }
+    res.json(results);
+  });
+});
+
+app.get('/pollutants', (req, res) => {
+  connection.query("SELECT * FROM pollutant", (err, results) => {
+    if (err) {
+      throw err;
+    }
+    res.json(results);
+  });
+});
+
+app.get('/emergencies', (req, res) => {
+  connection.query("SELECT * FROM emergency", (err, results) => {
+    if (err) {
+      throw err;
+    }
+    res.json(results);
+  });
+});
+
 app.get("/add-pollution", function (req, res) {
   res.render("addpollution.hbs");
 });
@@ -252,6 +281,10 @@ app.get("/add-company", function (req, res) {
 
 app.get("/add-pollutant", function (req, res) {
   res.render("addpollutant.hbs");
+});
+
+app.get("/add-emergency", function (req, res) {
+  res.render("addemergency.hbs");
 });
 
 
@@ -299,6 +332,17 @@ app.get("/editpollutant/:idpollutant", function (req, res) {
       if (err) return console.log(err);
       res.render("editpollutant.hbs", {
         pollutant: data[0]
+      });
+    });
+});
+
+app.get("/editemergency/:idemergency", function (req, res) {
+  const idemergency = req.params.idemergency;
+  connection.query(
+    "SELECT * FROM emergency WHERE idemergency = ?", [idemergency], function (err, data) {
+      if (err) return console.log(err);
+      res.render("editemergency.hbs", {
+        emergency: data[0]
       });
     });
 });
@@ -374,6 +418,34 @@ app.post("/add-pollutant", urlencodedParser, function (req, res) {
   res.redirect("/add-pollutant");
 });
 
+app.post("/add-emergency", urlencodedParser, function (req, res) {
+  if (!req.body) return res.sendStatus(400);
+  const emergency_name = req.body.emergency_name;
+  const idcompany = req.body.idcompany;
+  const emergency_date = req.body.emergency_date;
+  const fv = req.body.fv;
+  const fg = req.body.fg;
+  const pr = req.body.pr;
+  const prs = req.body.prs;
+  const sn = req.body.sn;
+  const mdg = req.body.mdg;
+  const mln = req.body.mln;
+  const mtn = req.body.mtn;
+  const min = req.body.min;
+  const mzn = req.body.mzn;
+
+  connection.query("INSERT INTO emergency(name, idcompany, date, fv, fg, pr, prs, sn, mdg, mln, mtn, min, mzn) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) as newem " +
+    "ON DUPLICATE KEY UPDATE name = newem.name, idcompany = newem.idcompany, date = newem.date, fv=newem.fv, fg=newem.fg, pr = newem.pr, prs=newem.prs,\
+    sn=newem.sn, mdg=newem.mdg, mln=newem.mln, mtn=newem.mtn, min=newem.min, mzn=newem.mzn",
+    [emergency_name, idcompany, emergency_date, fv, fg, pr, prs, sn, mdg, mln, mtn, min, mzn],
+    function (err, data) {
+      if (err) {
+        throw err;
+      }
+    });
+  res.redirect("/add-emergency");
+});
+
 app.post("/editpollution", urlencodedParser, function (req, res) {
   if (!req.body) return res.sendStatus(400);
   const idpollution = req.body.idpollution;
@@ -438,6 +510,32 @@ app.post("/editpollutant", urlencodedParser, function (req, res) {
     });
 });
 
+app.post("/editemergency", urlencodedParser, function (req, res) {
+  if (!req.body) return res.sendStatus(400);
+  const idemergency = req.body.idemergency;
+  const emergency_name = req.body.emergency_name;
+  const idcompany = req.body.idcompany;
+  const emergency_date = req.body.emergency_date;
+  const fv = req.body.fv;
+  const fg = req.body.fg;
+  const pr = req.body.pr;
+  const prs = req.body.prs;
+  const sn = req.body.sn;
+  const mdg = req.body.mdg;
+  const mln = req.body.mln;
+  const mtn = req.body.mtn;
+  const min = req.body.min;
+  const mzn = req.body.mzn;
+
+  connection.query("UPDATE emergency SET name = ?, idcompany = ?, date = ?, \
+  fv = ?, fg = ?, pr = ?, prs = ?, sn = ?, mdg = ?, mln = ?, mtn = ?, min = ?, mzn = ? \
+   WHERE idemergency = ?", [emergency_name, idcompany, emergency_date, fv, fg, pr, prs, sn, mdg, mln, mtn, min, mzn, idemergency], function (err, data) {
+      if (err) return console.log(err);
+      res.redirect("/emergency");
+    });
+  }
+);
+
 
 app.post("/deletepollution/:idpollution", function (req, res) {
   const idpollution = req.params.idpollution;
@@ -463,6 +561,14 @@ app.post("/deletepollutant/:idpollutant", function (req, res) {
   });
 });
 
+app.post("/deleteemergency/:idemergency", function (req, res) {
+  const idemergency = req.params.idemergency;
+  connection.query("DELETE FROM emergency WHERE idemergency=?", [idemergency], function (err, data) {
+    if (err) return console.log(err);
+    res.redirect("/emergency");
+  });
+});
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, process.cwd() + '/uploads/')
@@ -473,6 +579,15 @@ const storage = multer.diskStorage({
 });
 const uploadFile = multer({ storage: storage });
 
+app.post('/import-pollution', uploadFile.single('import-pollution-file'), (req, res) => {
+  if (!req.file) {
+    return res.status(400).send('No file uploaded.');
+  }
+  importFileToPollutionDb(process.cwd() + '/uploads/' + req.file.filename);
+  setTimeout(() => {
+    res.redirect("/");
+  }, 100);
+});
 
 app.post('/import-company', uploadFile.single('import-company-file'), (req, res) => {
   if (!req.file) {
@@ -494,13 +609,13 @@ app.post('/import-pollutant', uploadFile.single('import-pollutant-file'), (req, 
   }, 100);
 });
 
-app.post('/import-pollution', uploadFile.single('import-pollution-file'), (req, res) => {
+app.post('/import-emergency', uploadFile.single('import-emergency-file'), (req, res) => {
   if (!req.file) {
     return res.status(400).send('No file uploaded.');
   }
-  importFileToPollutionDb(process.cwd() + '/uploads/' + req.file.filename);
+  importFileToEmergencyDb(process.cwd() + '/uploads/' + req.file.filename);
   setTimeout(() => {
-    res.redirect("/");
+    res.redirect("/emergency");
   }, 100);
 });
 
@@ -591,6 +706,41 @@ function importFileToPollutantDb(exFile) {
         });
     }
   });
+}
+
+function importFileToEmergencyDb(exFile) {
+  readXlsxFile(exFile).then((rows) => {
+    rows.shift();
+
+    for (let i = 0; i < rows.length; i++) {
+      const emergency_name = rows[i][0];
+      const company_name = rows[i][1];
+      const emergency_date = rows[i][2];
+      const fv = rows[i][3];
+      const fg = rows[i][4];
+      const pr = rows[i][5];
+      const prs = rows[i][6];
+      const sn = rows[i][7];
+      const mdg = rows[i][8];
+      const mln = rows[i][9];
+      const mtn = rows[i][10];
+      const min = rows[i][11];
+      const mzn = rows[i][12];
+      
+      connection.query("INSERT INTO emergency(name, idcompany, date, fv, fg, pr, prs, sn, mdg, mln, mtn, min, mzn) \
+      VALUES (?, (SELECT idcompany FROM company WHERE name=?), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) AS newem \
+      ON DUPLICATE KEY UPDATE name = newem.name, idcompany = newem.idcompany, date = newem.date, fv=newem.fv, fg=newem.fg, pr = newem.pr, prs=newem.prs,\
+      sn=newem.sn, mdg=newem.mdg, mln=newem.mln, mtn=newem.mtn, min=newem.min, mzn=newem.mzn",
+       [emergency_name, company_name, emergency_date, fv, fg, pr, prs, sn, mdg, mln, mtn, min, mzn], function (err, data) {
+        if (err) {
+          if (err.code == 'ER_TRUNCATED_WRONG_VALUE_FOR_FIELD') {
+            console.log('Неправильний формат даних');
+            return console.log(err);
+          }
+        }
+      });
+    }
+  })
 }
 
 

@@ -12,11 +12,6 @@ body {
   align-items: center;
   justify-content: center;
   margin: 0;
-  margin-top: 1%;
-}
-
-.hidden {
-  display: none;
 }
 
 h1 {
@@ -28,8 +23,9 @@ h1 {
   text-align: center;
 }
 
-h2 {
-  padding-bottom: 15px;
+label {
+  font-weight: bold;
+  text-align: right;
 }
 
 .field {
@@ -40,18 +36,17 @@ h2 {
   border-radius: 5px;
 }
 
+
 .submit-button {
   background-color: #007acc;
-  font-size: 16px;
-  text-align: center;
   color: white;
   border: none;
-  width: 100%;
+  width: 50%;
   border-radius: 5px;
-  padding: 10px 0;
+  padding: 10px 20px;
   cursor: pointer;
   display: block;
-  margin: 10px 0;
+  margin: 0 auto;
 }
 
 .submit-button:hover {
@@ -71,6 +66,12 @@ a:hover {
   text-decoration: underline;
 }
 
+.edit-emergency {
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
 
 .back-button {
   display: block;
@@ -92,9 +93,18 @@ a:hover {
   text-decoration: none;
 }
 
-.form-column {
-  background-color: white;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+
+.delete-button-container {
+  position: relative;
+  background: none;
+  left: 95%;
+  color: red;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.delete-button {
+  background: none;
+  border: none;
+  cursor: pointer;
 }
